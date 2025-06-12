@@ -1,0 +1,367 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ping Pong Game</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #222;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+        }
+        
+		/*
+        #game-container {
+            position: relative;
+            width: 800px;
+            height: 500px;
+            background-color: #000;
+            border: 2px solid #fff;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+        }
+		*/
+		
+		#game-container {
+			position: relative;
+			width: 800px;
+			height: 500px;
+			border: 2px solid #fff;
+			box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+			/* Nuevas propiedades para el fondo */
+			background-image: url('ImagesPingPong/campo_juego1.jpg');
+			background-size: cover; /* Ajusta la imagen al tamaño del contenedor */
+			background-position: center; /* Centra la imagen */
+			background-repeat: no-repeat; /* Evita que se repita */
+			overflow: hidden;
+		}
+        
+     /* Reemplaza los estilos existentes de #paddleA y #paddleB con: */
+		#paddleA, #paddleB {
+			position: absolute;
+			width: 30px; /* Ajusta según el tamaño de tu imagen */
+			height: 100px;
+			image-rendering: pixelated; /* Para mantener calidad en imágenes pequeñas */
+			user-select: none; /* Evitar selección accidental de la imagen */
+		}
+
+		#paddleA {
+			left: 20px;
+		}
+
+		#paddleB {
+			right: 20px;
+		}
+        
+  /*
+  #ball {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-color: #fff;
+            border-radius: 50%;
+            top: 240px;
+            left: 390px;
+        }
+*/		
+		
+		#ball {
+    position: absolute;
+    width: 30px; /* Ajusta según el tamaño de tu imagen */
+    height: 30px;
+    /* Elimina estas líneas: */
+    /* background-color: #fff; */
+    /* border-radius: 50%; */
+    top: 240px;
+    left: 390px;
+	border-radius:50px;
+    image-rendering: pixelated; /* Para mantener calidad en imágenes pequeñas */
+}
+
+        
+        #score {
+            position: absolute;
+            top: 20px;
+            width: 100%;
+            text-align: center;
+            color: #fff;
+            font-size: 32px;
+        }
+        
+        #center-line {
+            position: absolute;
+            width: 2px;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.2);
+            left: 50%;
+        }
+        
+        #start-screen {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            z-index: 10;
+        }
+        
+        #start-button {
+            margin-top: 20px;
+            padding: 10px 30px;
+            font-size: 20px;
+            background-color: #0af;
+            border: none;
+            color: white;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        
+        #start-button:hover {
+            background-color: #09f;
+        }
+        
+        #game-over {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            z-index: 10;
+        }
+        
+        #restart-button {
+            margin-top: 20px;
+            padding: 10px 30px;
+            font-size: 20px;
+            background-color: #f0a;
+            border: none;
+            color: white;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        
+        #restart-button:hover {
+            background-color: #e09;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <div id="center-line"></div>
+       <!-- <div id="paddleA"></div>
+        <div id="paddleB"></div> -->
+       <!--  <div id="ball"></div> -->
+	   <!-- Por esto: -->
+		<img id="paddleA" src="ImagesPingPong/jugador.png" alt="Raqueta izquierda">
+		<img id="paddleB" src="ImagesPingPong/jugador.png" alt="Raqueta derecha">
+	   <img id="ball" src="pelota123.jpg" alt="Pelota de ping pong">
+        <div id="score">0 - 0</div>
+        
+        <div id="start-screen">
+            <h1>Ping Pong</h1>
+            <p>Usa las teclas W/S para mover la paleta izquierda</p>
+            <p>Usa las flechas arriba/abajo para mover la paleta derecha</p>
+            <button id="start-button">Comenzar Juego</button>
+        </div>
+        
+        <div id="game-over">
+            <h1 id="winner-text">¡Jugador 1 Gana!</h1>
+            <p id="final-score">Puntuación final: 0 - 0</p>
+            <button id="restart-button">Jugar de Nuevo</button>
+        </div>
+    </div>
+
+    <script>
+        // Elementos del juego
+        const gameContainer = document.getElementById('game-container');
+        const paddleA = document.getElementById('paddleA');
+        const paddleB = document.getElementById('paddleB');
+        const ball = document.getElementById('ball');
+        const scoreDisplay = document.getElementById('score');
+        const startScreen = document.getElementById('start-screen');
+        const startButton = document.getElementById('start-button');
+        const gameOverScreen = document.getElementById('game-over');
+        const restartButton = document.getElementById('restart-button');
+        const winnerText = document.getElementById('winner-text');
+        const finalScore = document.getElementById('final-score');
+
+        // Variables del juego
+        let paddleAHeight = 100;
+        let paddleBHeight = 100;
+        let paddleAY = 200;
+        let paddleBY = 200;
+        let ballX = 390;
+        let ballY = 240;
+        let ballSpeedX = 5;
+        let ballSpeedY = 5;
+        let scoreA = 0;
+        let scoreB = 0;
+        let gameRunning = false;
+        const winningScore = 5;
+        
+        // Tamaño del área de juego
+        const gameWidth = 800;
+        const gameHeight = 500;
+        
+        // Controles
+        const keys = {
+            w: false,
+            s: false,
+            ArrowUp: false,
+            ArrowDown: false
+        };
+        
+        // Event listeners para controles
+        document.addEventListener('keydown', (e) => {
+            if (e.key in keys) {
+                keys[e.key] = true;
+            }
+        });
+        
+        document.addEventListener('keyup', (e) => {
+            if (e.key in keys) {
+                keys[e.key] = false;
+            }
+        });
+        
+        // Iniciar juego
+        startButton.addEventListener('click', startGame);
+        restartButton.addEventListener('click', startGame);
+        
+        function startGame() {
+            scoreA = 0;
+            scoreB = 0;
+            paddleAY = 200;
+            paddleBY = 200;
+            ballX = 390;
+            ballY = 240;
+            ballSpeedX = 5 * (Math.random() > 0.5 ? 1 : -1);
+            ballSpeedY = 5 * (Math.random() > 0.5 ? 1 : -1);
+            
+            updateScore();
+            startScreen.style.display = 'none';
+            gameOverScreen.style.display = 'none';
+            gameRunning = true;
+            
+            // Iniciar el bucle del juego
+            requestAnimationFrame(gameLoop);
+        }
+        
+        function gameLoop() {
+            if (!gameRunning) return;
+            
+            // Mover paletas
+            if (keys.w && paddleAY > 0) {
+                paddleAY -= 8;
+            }
+            if (keys.s && paddleAY < gameHeight - paddleAHeight) {
+                paddleAY += 8;
+            }
+            if (keys.ArrowUp && paddleBY > 0) {
+                paddleBY -= 8;
+            }
+            if (keys.ArrowDown && paddleBY < gameHeight - paddleBHeight) {
+                paddleBY += 8;
+            }
+            
+            // Actualizar posición de las paletas
+            paddleA.style.top = paddleAY + 'px';
+            paddleB.style.top = paddleBY + 'px';
+            
+            // Mover pelota
+            ballX += ballSpeedX;
+            ballY += ballSpeedY;
+            
+            // Colisión con paredes superior e inferior
+            if (ballY <= 0 || ballY >= gameHeight - 20) {
+                ballSpeedY = -ballSpeedY;
+            }
+            
+            // Colisión con paleta izquierda
+            if (ballX <= 35 && ballX >= 20 && ballY + 20 >= paddleAY && ballY <= paddleAY + paddleAHeight) {
+                ballSpeedX = -ballSpeedX * 1.1; // Aumentar velocidad
+                // Añadir efecto según donde golpee la pelota
+                let hitPosition = (ballY - (paddleAY + paddleAHeight/2)) / (paddleAHeight/2);
+                ballSpeedY = hitPosition * 8;
+            }
+            
+            // Colisión con paleta derecha
+            if (ballX >= gameWidth - 35 && ballX <= gameWidth - 20 && ballY + 20 >= paddleBY && ballY <= paddleBY + paddleBHeight) {
+                ballSpeedX = -ballSpeedX * 1.1; // Aumentar velocidad
+                // Añadir efecto según donde golpee la pelota
+                let hitPosition = (ballY - (paddleBY + paddleBHeight/2)) / (paddleBHeight/2);
+                ballSpeedY = hitPosition * 8;
+            }
+            
+            // Punto para jugador B (la pelota sale por la izquierda)
+            if (ballX < 0) {
+                scoreB++;
+                resetBall();
+            }
+            
+            // Punto para jugador A (la pelota sale por la derecha)
+            if (ballX > gameWidth) {
+                scoreA++;
+                resetBall();
+            }
+            
+            // Actualizar posición de la pelota
+            ball.style.left = ballX + 'px';
+            ball.style.top = ballY + 'px';
+            
+            // Verificar si alguien ganó
+            if (scoreA >= winningScore || scoreB >= winningScore) {
+                endGame();
+                return;
+            }
+            
+            // Continuar el bucle del juego
+            requestAnimationFrame(gameLoop);
+        }
+        
+        function resetBall() {
+            ballX = gameWidth / 2 - 10;
+            ballY = gameHeight / 2 - 10;
+            ballSpeedX = 5 * (Math.random() > 0.5 ? 1 : -1);
+            ballSpeedY = 5 * (Math.random() > 0.5 ? 1 : -1);
+            updateScore();
+            
+            // Pequeña pausa antes de continuar
+            gameRunning = false;
+            setTimeout(() => {
+                gameRunning = true;
+                requestAnimationFrame(gameLoop);
+            }, 1000);
+        }
+        
+        function updateScore() {
+            scoreDisplay.textContent = `${scoreA} - ${scoreB}`;
+        }
+        
+        function endGame() {
+            gameRunning = false;
+            if (scoreA >= winningScore) {
+                winnerText.textContent = "¡Jugador 1 Gana!";
+            } else {
+                winnerText.textContent = "¡Jugador 2 Gana!";
+            }
+            finalScore.textContent = `Puntuación final: ${scoreA} - ${scoreB}`;
+            gameOverScreen.style.display = 'flex';
+        }
+    </script>
+</body>
+</html>
