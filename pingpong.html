@@ -281,7 +281,8 @@
             // Actualizar posición de las paletas
             paddleA.style.top = paddleAY + 'px';
             paddleB.style.top = paddleBY + 'px';
-            
+
+		//This is a new comment
             // Mover pelota
             ballX += ballSpeedX;
             ballY += ballSpeedY;
@@ -339,8 +340,14 @@
             ballSpeedX = 5 * (Math.random() > 0.5 ? 1 : -1);
             ballSpeedY = 5 * (Math.random() > 0.5 ? 1 : -1);
             updateScore();
-            
-            // Pequeña pausa antes de continuar
+
+	 console.log("ballX ");
+          console.log(ballX);
+
+		 console.log("ballY ");
+          console.log(ballY);
+		
+		// Pequeña pausa antes de continuar
             gameRunning = false;
             setTimeout(() => {
                 gameRunning = true;
